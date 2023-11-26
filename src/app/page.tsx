@@ -2,29 +2,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
+import WatcherForm from './components/WatcherForm';
 
 export default function Home() {
   const [accountState, setAccountState] = useState({});
   const prevAccountStateRef = useRef({}); // Ref to store previous state
 
   function fetchAccountState() {
-    fetch('http://localhost:8000/account-watcher/') //TODO: CHANGE TO ENV VARIABLE 
+    fetch('http://localhost:8000/account-watcher/')
       .then((response) => response.json())
       .then((data) => {
-        console.log('Account state:', data);
-
-        // Check for changes and show toast if there's any change
-        Object.entries(data).forEach(([title, balance]) => {
-          const prevBalance = prevAccountStateRef.current[title];
-          if (prevBalance !== undefined && prevBalance !== balance) {
-            toast(`${title} balance updated: ${prevBalance.toFixed(2)} → ${balance.toFixed(2)}`, {
-              duration: 4000,
-              position: "top-right",
-            });
-          }
-        });
-
-        // Store the previous state
+        console.log('Account state:', data);  // FIXM
         prevAccountStateRef.current = accountState;
         setAccountState(data);
       })
@@ -33,10 +21,9 @@ export default function Home() {
       );
   }
 
-  // Poll the server every 60 seconds
   useEffect(() => {
     fetchAccountState();
-    const interval = setInterval(fetchAccountState, 60000); // Corrected to 60 seconds
+    const interval = setInterval(fetchAccountState, 6000);
 
     return () => {
       clearInterval(interval);
@@ -46,6 +33,8 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Toaster />
+      <WatcherForm />
+      <h1>Watched Accounts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {Object.entries(accountState).map(([title, balance]) => {
           // Compare the new value with the previous value
@@ -58,7 +47,7 @@ export default function Home() {
               initial={{ rotateY: 180, opacity: 0 }}
               animate={{ rotateY: 0, opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1 }}
               className="rounded-lg border border-gray-300 shadow-md p-4"
             >
               <h2 className="font-semibold truncate">{title}</h2>
@@ -69,7 +58,7 @@ export default function Home() {
                     initial={{ rotateY: 180, opacity: 0 }}
                     animate={{ rotateY: 0, opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 1 }}
                   >
                     {balance.toFixed(2)}
                   </motion.span>
