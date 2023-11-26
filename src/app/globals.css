@@ -34,3 +34,18 @@ body {
 .balance-decreased {
   color: red;
 }
+
+
+.glowing-box {
+ 
+  animation: glow 2s;
+}
+
+@keyframes glow {
+  0%, 100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: green;
+  }
+}

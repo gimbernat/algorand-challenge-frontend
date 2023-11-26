@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const WatcherForm = () => {
     const [address, setAddress] = useState('');
-    const [isLoading, setIsLoading] = useState(false); 
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true); 
+        setIsLoading(true);
         try {
             const response = await fetch(`http://localhost:8000/account-watcher/add/${address}`, {
                 method: 'POST',
             });
             const data = await response.text();
+            toast("Added Account")
             console.log(data);
+
             setAddress('');
         } catch (error) {
             console.error('Error:', error);
@@ -29,12 +32,12 @@ const WatcherForm = () => {
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Enter Account Address"
                 className="p-2 bg-transparent border border-gray-300 rounded"
-                disabled={isLoading} 
+                disabled={isLoading}
             />
             <button
                 type="submit"
-                className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                disabled={isLoading} 
+                className="p-2 bg-green-500 text-white rounded hover:bg-blue-600"
+                disabled={isLoading}
             >
                 {isLoading ? 'Adding Address...' : 'Add Account'}
             </button>

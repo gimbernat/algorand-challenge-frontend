@@ -29,34 +29,38 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  function handleDelete(address:string) {
+  function handleDelete(address: string) {
     fetch(`http://localhost:8000/account-watcher/remove/${address}`, {
       method: 'DELETE',
     })
       .then(() => {
         console.log(`Deleted account: ${address}`);
         fetchAccountState(); // Refresh account state
+        toast(`Removed Account`)
       })
       .catch(error => console.error('Error deleting account:', error));
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex gap-12 flex-col items-center justify-between p-24">
       <Toaster />
       <WatcherForm />
       <h1>Watched Accounts</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Object.entries(accountState).map(([title, balance]) => {
           const prevValue = prevAccountStateRef.current[title] || 0;
           const valueChanged = prevValue !== balance;
 
           return (
-            <motion.div key={title} className="relative rounded-lg border border-gray-300 shadow-md p-8">
+            <motion.div 
+              animate={{ rotateY: 0, opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1 }} className="relative  border border-dashed border-2 border-gray-300 shadow-md p-8">
               <button
                 className="absolute top-2 right-2 hover:scale-110 transition-transform"
                 onClick={() => handleDelete(title)}
               >
-                <IoTrashBinOutline className="text-red-600 hover:text-red-800" size="1.5em" />
+                <IoTrashBinOutline className="text-red-600 hover:text-red-800" size="1em" />
               </button>
 
               <h2 className="font-semibold truncate">{title}</h2>
@@ -64,10 +68,7 @@ export default function Home() {
                 {valueChanged ? (
                   <motion.span
                     key={balance}
-                    initial={{ rotateY: 180, opacity: 0 }}
-                    animate={{ rotateY: 0, opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 1 }}
+                    className='glowing-box'
                   >
                     {balance.toFixed(2)}
                   </motion.span>
