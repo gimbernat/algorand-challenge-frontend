@@ -12,7 +12,6 @@ export default function Home() {
 
 
   useEffect(() => {
-    // Initialize WebSocket connection only if it's not already established
     if (!webSocketRef.current) {
       webSocketRef.current = new WebSocket('ws://localhost:8000');
 
@@ -101,12 +100,11 @@ export default function Home() {
               <p className="text-lg text-gray-600">
                 {valueChanged ? (
                   <span
-                    key={data.amount}
-                    className='glowing-box'
-                  >
-                    Balance : {balance}                 </span>
+                    key={data.amount} className='glowing-box' >
+                    Balance : {balance}
+                  </span>
                 ) : (
-                  <div>   Balance : {balance}  </div>
+                  <div> Balance : {balance}  </div>
                 )}
               </p>
             </div>
