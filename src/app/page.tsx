@@ -25,7 +25,6 @@ export default function Home() {
   useEffect(() => {
     fetchAccountState();
     const interval = setInterval(fetchAccountState, 6000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -47,33 +46,35 @@ export default function Home() {
       <WatcherForm />
       <h1>Watched Accounts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(accountState).map(([title, balance]) => {
-          const prevValue = prevAccountStateRef.current[title] || 0;
-          const valueChanged = prevValue !== balance;
+        {Object.entries(accountState).map(([account, data]) => {
+          console.log(data)
+          const prevValue = prevAccountStateRef.current[account] || 0;
+          const valueChanged = prevValue !== data;
 
           return (
-            <motion.div 
+            <motion.div
+              key={account}
               animate={{ rotateY: 0, opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1 }} className="relative  border border-dashed border-2 border-gray-300 shadow-md p-8">
               <button
                 className="absolute top-2 right-2 hover:scale-110 transition-transform"
-                onClick={() => handleDelete(title)}
+                onClick={() => handleDelete(account)}
               >
                 <IoTrashBinOutline className="text-red-600 hover:text-red-800" size="1em" />
               </button>
 
-              <h2 className="font-semibold truncate">{title}</h2>
+              <h2 className="font-semibold truncate">{account}</h2>
               <p className="text-lg text-gray-600">
                 {valueChanged ? (
                   <motion.span
-                    key={balance}
+                    key={data.amount}
                     className='glowing-box'
                   >
-                    {balance.toFixed(2)}
+                    {data.amount.toFixed(2)}
                   </motion.span>
                 ) : (
-                  balance.toFixed(2)
+                  data.amount.toFixed(2)
                 )}
               </p>
             </motion.div>
