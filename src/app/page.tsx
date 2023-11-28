@@ -10,7 +10,6 @@ export default function Home() {
   const prevAccountStateRef = useRef({});
   const webSocketRef = useRef<null | WebSocket>(null);
 
-  webSocketRef.current = new WebSocket('ws://localhost:8000');
 
   useEffect(() => {
     // Initialize WebSocket connection only if it's not already established
@@ -85,7 +84,34 @@ export default function Home() {
       <WatcherForm />
       <h1>Watched Accounts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-   
+        {Object.entries(accountState).map(([account, data]) => {
+          const prevValue = prevAccountStateRef.current[account] || 0;
+          const valueChanged = prevValue !== data;
+          const balance = data.amount ? data.amount.toFixed(2) : 0
+          return (
+            <div className='relative border border-2 p-6' key={account}>
+              <button
+                className="absolute top-2 right-2 hover:scale-110 transition-transform"
+                onClick={() => handleDelete(account)}
+              >
+                <IoTrashBinOutline className="text-red-600 hover:text-red-800" size="1em" />
+              </button>
+
+              <h2 className="font-semibold truncate">{account}</h2>
+              <p className="text-lg text-gray-600">
+                {valueChanged ? (
+                  <span
+                    key={data.amount}
+                    className='glowing-box'
+                  >
+                    Balance : {balance}                 </span>
+                ) : (
+                  <div>   Balance : {balance}  </div>
+                )}
+              </p>
+            </div>
+          );
+        })}
       </div>
     </main>
   );
