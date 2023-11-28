@@ -24,7 +24,6 @@ export default function Home() {
       webSocketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'balanceChange') {
-          console.log(event.data)
           setAccountState(prevState => ({
             ...prevState,
             [data.data.account]: data.data.newState
@@ -86,39 +85,7 @@ export default function Home() {
       <WatcherForm />
       <h1>Watched Accounts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(accountState).map(([account, data]) => {
-          const prevValue = prevAccountStateRef.current[account] || 0;
-          const valueChanged = prevValue !== data;
-
-          return (
-            <motion.div
-              key={account}
-              animate={{ rotateY: 0, opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1 }} className="relative  border border-dashed border-2 border-gray-300 shadow-md p-8">
-              <button
-                className="absolute top-2 right-2 hover:scale-110 transition-transform"
-                onClick={() => handleDelete(account)}
-              >
-                <IoTrashBinOutline className="text-red-600 hover:text-red-800" size="1em" />
-              </button>
-
-              <h2 className="font-semibold truncate">{account}</h2>
-              <p className="text-lg text-gray-600">
-                {valueChanged ? (
-                  <motion.span
-                    key={data.amount}
-                    className='glowing-box'
-                  >
-                    {data.amount.toFixed(2)}
-                  </motion.span>
-                ) : (
-                  data.amount.toFixed(2)
-                )}
-              </p>
-            </motion.div>
-          );
-        })}
+   
       </div>
     </main>
   );
