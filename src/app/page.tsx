@@ -3,17 +3,57 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import WatcherForm from './components/WatcherForm';
-import { IoTrashBinOutline } from 'react-icons/io5'; // Import the icon for the delete button
+import { IoTrashBinOutline } from 'react-icons/io5';
 
 export default function Home() {
   const [accountState, setAccountState] = useState({});
-  const prevAccountStateRef = useRef({}); // Ref to store previous state
+  const prevAccountStateRef = useRef({});
+  const webSocketRef = useRef<null | WebSocket>(null);
+
+  webSocketRef.current = new WebSocket('ws://localhost:8000');
+
+  useEffect(() => {
+    // Initialize WebSocket connection only if it's not already established
+    if (!webSocketRef.current) {
+      webSocketRef.current = new WebSocket('ws://localhost:8000');
+
+      webSocketRef.current.onopen = () => {
+        console.log('WebSocket connection established');
+      };
+
+      webSocketRef.current.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'balanceChange') {
+          console.log(event.data)
+          setAccountState(prevState => ({
+            ...prevState,
+            [data.data.account]: data.data.newState
+          }));
+        }
+      };
+
+      webSocketRef.current.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      webSocketRef.current.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+    }
+
+    return () => {
+      // Close the WebSocket only when the component is unmounted
+      if (webSocketRef.current) {
+        webSocketRef.current.close();
+        webSocketRef.current = null;
+      }
+    };
+  }, []); // Empty dependency array to ensure this runs only once
 
   function fetchAccountState() {
     fetch('http://localhost:8000/account-watcher/')
       .then((response) => response.json())
       .then((data) => {
-        console.log('Account state:', data);
         prevAccountStateRef.current = accountState;
         setAccountState(data);
       })
@@ -47,7 +87,6 @@ export default function Home() {
       <h1>Watched Accounts</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Object.entries(accountState).map(([account, data]) => {
-          console.log(data)
           const prevValue = prevAccountStateRef.current[account] || 0;
           const valueChanged = prevValue !== data;
 
